@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import moment from 'moment-timezone';
 import { Producto } from './entities/producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { VerificarProductoDto } from './dto/verificar-producto.dto';
@@ -22,7 +21,7 @@ export class ProductosService {
     const producto = this.productoRepo.create({
       nombre: dto.nombre,
       cantidadInicial: dto.cantidadInicial,
-      turno: this.calcularTurno(now),
+      turno: this.calcularTurno(),
     });
     return this.productoRepo.save(producto);
   }
@@ -54,9 +53,7 @@ export class ProductosService {
     producto.cantidadVerificada =
       dto.cantidadVerificada;
     producto.fechaVerificacion = fechaVerificacion;
-    producto.turnoVerificacion = this.calcularTurno(
-      fechaVerificacion,
-    );
+    producto.turnoVerificacion = this.calcularTurno();
 
     producto.estado =
       producto.cantidadInicial ===
@@ -97,21 +94,20 @@ export class ProductosService {
     };
   }
 
-private calcularTurno(fecha: Date) {
-  const colombia = moment(fecha).tz(
-    'America/Bogota',
+private calcularTurno() {
+  const bogota = new Date(
+    new Date().toLocaleString('en-US', {
+      timeZone: 'America/Bogota',
+    }),
   );
 
-  console.log(
-    'Hora Colombia:',
-    colombia.format('YYYY-MM-DD HH:mm:ss'),
-  );
+  console.log('ISO:', new Date().toISOString());
+  console.log('Hora Bogotá:', bogota.getHours());
+  console.log('Minutos Bogotá:', bogota.getMinutes());
 
-  const hora = colombia.hour();
-  const minuto = colombia.minute();
-
-  return hora < 14 ||
-    (hora === 14 && minuto < 50)
+  return bogota.getHours() < 14 ||
+    (bogota.getHours() === 14 &&
+      bogota.getMinutes() < 50)
     ? 'MAÑANA'
     : 'TARDE';
 }
