@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
+import moment from 'moment-timezone';
 import { Producto } from './entities/producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { VerificarProductoDto } from './dto/verificar-producto.dto';
@@ -97,11 +97,22 @@ export class ProductosService {
     };
   }
 
-  private calcularTurno(fecha: Date) {
-    return fecha.getHours() < 14 ||
-      (fecha.getHours() === 14 &&
-        fecha.getMinutes() < 50)
-      ? 'MAÑANA'
-      : 'TARDE';
-  }
+private calcularTurno(fecha: Date) {
+  const colombia = moment(fecha).tz(
+    'America/Bogota',
+  );
+
+  console.log(
+    'Hora Colombia:',
+    colombia.format('YYYY-MM-DD HH:mm:ss'),
+  );
+
+  const hora = colombia.hour();
+  const minuto = colombia.minute();
+
+  return hora < 14 ||
+    (hora === 14 && minuto < 50)
+    ? 'MAÑANA'
+    : 'TARDE';
+}
 }
