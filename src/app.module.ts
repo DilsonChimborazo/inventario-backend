@@ -25,7 +25,7 @@ const databaseConfig = process.env.DATABASE_URL
     TypeOrmModule.forRoot({
       ...databaseConfig,
       autoLoadEntities: true,
-      synchronize: false,
+      synchronize: true,
     }),
     ProductosModule,
   ],
