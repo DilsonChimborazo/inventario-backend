@@ -21,7 +21,7 @@ export class ProductosService {
     const producto = this.productoRepo.create({
       nombre: dto.nombre,
       cantidadInicial: dto.cantidadInicial,
-      turno: this.calcularTurno(),
+      turno: this.calcularTurno(now),
     });
     return this.productoRepo.save(producto);
   }
@@ -53,7 +53,7 @@ export class ProductosService {
     producto.cantidadVerificada =
       dto.cantidadVerificada;
     producto.fechaVerificacion = fechaVerificacion;
-    producto.turnoVerificacion = this.calcularTurno();
+    producto.turnoVerificacion = this.calcularTurno(fechaVerificacion);
 
     producto.estado =
       producto.cantidadInicial ===
@@ -94,20 +94,15 @@ export class ProductosService {
     };
   }
 
-private calcularTurno() {
+private calcularTurno(fecha: Date) {
   const bogota = new Date(
-    new Date().toLocaleString('en-US', {
+    fecha.toLocaleString('en-US', {
       timeZone: 'America/Bogota',
     }),
   );
 
-  console.log('ISO:', new Date().toISOString());
-  console.log('Hora Bogotá:', bogota.getHours());
-  console.log('Minutos Bogotá:', bogota.getMinutes());
-
   return bogota.getHours() < 14 ||
-    (bogota.getHours() === 14 &&
-      bogota.getMinutes() < 50)
+    (bogota.getHours() === 14 && bogota.getMinutes() < 50)
     ? 'MAÑANA'
     : 'TARDE';
 }
