@@ -15,13 +15,15 @@ export class ProductosService {
 
   async create(dto: CreateProductoDto) {
     const now = new Date();
-
+    console.log('ISO:', now.toISOString());
+    console.log('Hours:', now.getHours());
+    console.log('Minutes:', now.getMinutes());
+    console.log('Timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
     const producto = this.productoRepo.create({
       nombre: dto.nombre,
       cantidadInicial: dto.cantidadInicial,
       turno: this.calcularTurno(now),
     });
-
     return this.productoRepo.save(producto);
   }
 
@@ -99,7 +101,7 @@ export class ProductosService {
     return fecha.getHours() < 14 ||
       (fecha.getHours() === 14 &&
         fecha.getMinutes() < 50)
-      ? 'MANANA'
+      ? 'MAÑANA'
       : 'TARDE';
   }
 }
