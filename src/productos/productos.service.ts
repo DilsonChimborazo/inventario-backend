@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Producto } from './entities/producto.entity';
 import { CreateProductoDto } from './dto/create-producto.dto';
+import { UpdateProductoDto } from './dto/update-producto.dto';
 import { VerificarProductoDto } from './dto/verificar-producto.dto';
 
 @Injectable()
@@ -14,10 +15,6 @@ export class ProductosService {
 
   async create(dto: CreateProductoDto) {
     const now = new Date();
-    console.log('ISO:', now.toISOString());
-    console.log('Hours:', now.getHours());
-    console.log('Minutes:', now.getMinutes());
-    console.log('Timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
     const producto = this.productoRepo.create({
       nombre: dto.nombre,
       cantidadInicial: dto.cantidadInicial,
@@ -60,6 +57,25 @@ export class ProductosService {
       dto.cantidadVerificada
         ? 'CORRECTO'
         : 'NO COINCIDE';
+
+    return this.productoRepo.save(producto);
+  }
+
+  async update(
+    id: number,
+    dto: UpdateProductoDto,
+  ) {
+    const producto = await this.productoRepo.findOne({
+      where: { id },
+    });
+
+    if (!producto) {
+      throw new NotFoundException(
+        'Producto no encontrado',
+      );
+    }
+
+    producto.cantidadInicial = dto.cantidadInicial;
 
     return this.productoRepo.save(producto);
   }
